@@ -6,6 +6,8 @@ VENV := .venv
 BIN := $(VENV)/bin
 PYTHON_VENV := $(BIN)/python
 PIP := $(BIN)/pip
+PYTEST := $(BIN)/pytest
+PYTEST_WATCH := $(BIN)/pytest-watch
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -25,13 +27,13 @@ install: ## Install dependencies (requires active venv)
 	pip install -r requirements.txt
 
 test: ## Run all tests
-	pytest tests/ -v
+	PYTHONPATH=. $(PYTEST) tests/ -v
 
 test-watch: ## Run tests in watch mode
-	pytest-watch tests/ -v
+	PYTHONPATH=. $(PYTEST_WATCH) tests/ -v
 
 coverage: ## Run tests with coverage report
-	pytest tests/ --cov=src --cov-report=html --cov-report=term
+	PYTHONPATH=. $(PYTEST) tests/ --cov=src --cov-report=html --cov-report=term
 
 clean: ## Remove virtual environment and cache files
 	rm -rf $(VENV)
