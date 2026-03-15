@@ -21,10 +21,34 @@ class TestCurrencyExchange:
         exchange = CurrencyExchange()
         assert exchange is not None
 
-    # TODO: Add more tests following TDD approach
-    # Example ideas:
-    # - test_convert_same_currency
-    # - test_convert_usd_to_eur
-    # - test_convert_with_invalid_currency
-    # - test_get_exchange_rate
-    # - test_set_exchange_rate
+    def test_convert_same_currency(self):
+        """Test converting an amount when both currencies are the same."""
+        exchange = CurrencyExchange()
+        result = exchange.convert(100, "USD", "USD")
+        assert result == 100
+
+    def test_set_exchange_rate(self):
+        """Test setting an exchange rate between two currencies."""
+        exchange = CurrencyExchange()
+        exchange.set_exchange_rate("USD", "EUR", 0.85)
+        # If no exception is raised, the test passes
+
+    def test_get_exchange_rate(self):
+        """Test retrieving a previously set exchange rate."""
+        exchange = CurrencyExchange()
+        exchange.set_exchange_rate("USD", "EUR", 0.85)
+        rate = exchange.get_exchange_rate("USD", "EUR")
+        assert rate == 0.85
+
+    def test_convert_usd_to_eur(self):
+        """Test converting USD to EUR using the exchange rate."""
+        exchange = CurrencyExchange()
+        exchange.set_exchange_rate("USD", "EUR", 0.85)
+        result = exchange.convert(100, "USD", "EUR")
+        assert result == 85.0
+
+    def test_convert_with_invalid_currency(self):
+        """Test that converting without a set exchange rate raises an exception."""
+        exchange = CurrencyExchange()
+        with pytest.raises(ValueError, match="Exchange rate not found"):
+            exchange.convert(100, "JPY", "GBP")
