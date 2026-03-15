@@ -9,7 +9,6 @@ Follow TDD principles:
 Example test structure for workshop participants:
 """
 
-import pytest
 from src.currency_exchange import CurrencyExchange
 
 

@@ -1,4 +1,4 @@
-.PHONY: setup install test test-watch coverage clean help
+.PHONY: setup install test test-watch coverage lint lint-fix format typecheck check clean help
 
 # Python and virtual environment configuration
 PYTHON := python3
@@ -8,6 +8,8 @@ PYTHON_VENV := $(BIN)/python
 PIP := $(BIN)/pip
 PYTEST := $(BIN)/pytest
 PYTEST_WATCH := $(BIN)/pytest-watch
+RUFF := $(BIN)/ruff
+PYRIGHT := $(BIN)/pyright
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -34,6 +36,23 @@ test-watch: ## Run tests in watch mode
 
 coverage: ## Run tests with coverage report
 	PYTHONPATH=. $(PYTEST) tests/ --cov=src --cov-report=html --cov-report=term
+
+lint: ## Run ruff linter
+	$(RUFF) check src tests
+
+lint-fix: ## Auto-fix linting issues with ruff
+	$(RUFF) check --fix src tests
+
+format: ## Format code with ruff
+	$(RUFF) format src tests
+
+format-check: ## Check code formatting without making changes
+	$(RUFF) format --check src tests
+
+typecheck: ## Run pyright type checker
+	$(PYRIGHT)
+
+check: lint format-check typecheck ## Run all checks (lint, format-check, typecheck)
 
 clean: ## Remove virtual environment and cache files
 	rm -rf $(VENV)

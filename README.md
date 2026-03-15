@@ -36,6 +36,44 @@ make test-watch
 make coverage
 ```
 
+## Code Quality
+
+### Lint code with ruff
+
+```bash
+make lint
+```
+
+### Auto-fix linting issues
+
+```bash
+make lint-fix
+```
+
+### Format code with ruff
+
+```bash
+make format
+```
+
+### Check formatting without changes
+
+```bash
+make format-check
+```
+
+### Type check with pyright
+
+```bash
+make typecheck
+```
+
+### Run all checks (lint + format-check + typecheck)
+
+```bash
+make check
+```
+
 ## Workshop Structure
 
 - `src/` - Source code directory
