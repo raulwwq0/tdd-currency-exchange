@@ -172,37 +172,24 @@ Any object that inherits from `RateProvider` and implements `get_rate` can be us
 
 ### Step 1 — Implement `StaticRateProvider.get_rate`
 
-Open `src/rate_provider.py` and replace the `NotImplementedError` stub with real logic:
+Open `src/rate_provider.py` and replace the `NotImplementedError` stub with real logic.
 
-```python
-def get_rate(self, from_currency: str, to_currency: str) -> float:
-    pair = (from_currency.upper(), to_currency.upper())
-    if pair not in self._rates:
-        raise ValueError(f"No rate available for {from_currency} -> {to_currency}")
-    return self._rates[pair]
-```
+Start in `tests/test_rate_provider.py` — write a failing test, implement the method, then refactor.
 
-Follow TDD: write a failing test first, then add the code above, then refactor.
+**Hints**:
+
+- Look up the currency pair in `self._rates`
+- Raise `ValueError` when the pair is not found
 
 ### Step 2 — Integrate `RateProvider` with `CurrencyExchange`
 
-Update `CurrencyExchange` to accept an optional provider at construction time:
+Update `CurrencyExchange` to accept a `RateProvider` and use it inside `convert()`.
 
-```python
-from src.rate_provider import RateProvider
+**Hints**:
 
-class CurrencyExchange:
-    def __init__(self, rate_provider: RateProvider | None = None):
-        self._rate_provider = rate_provider
-
-    def convert(self, amount: float, from_currency: str, to_currency: str) -> float:
-        if from_currency == to_currency:
-            return amount
-        rate = self._rate_provider.get_rate(from_currency, to_currency)
-        return amount * rate
-```
-
-The provider is injected via the constructor — `CurrencyExchange` never needs to know where the rates come from.
+- Accept the provider via `__init__` (dependency injection)
+- Delegate the rate lookup to the provider — `CurrencyExchange` should not know where rates come from
+- Drive the change from `tests/test_integration.py`
 
 ### Step 3 — Write integration tests
 
