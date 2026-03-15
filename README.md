@@ -145,3 +145,62 @@ Follow the TDD cycle for each test case below:
 - Refactor if needed, keeping tests green
 - Commit after each green test
 - Move to the next test only when current test is passing
+
+---
+
+## Workshop Exercise: Rate Provider
+
+### Overview
+
+`src/rate_provider.py` contains two classes that form the foundation of a pluggable rate-fetching system:
+
+| Class                | Purpose                                                                    |
+| -------------------- | -------------------------------------------------------------------------- |
+| `RateProvider`       | Abstract base class — defines the contract every provider must fulfil      |
+| `StaticRateProvider` | Concrete stub backed by an in-memory dict — **your implementation target** |
+
+### The `RateProvider` contract
+
+```python
+class RateProvider(ABC):
+    @abstractmethod
+    def get_rate(self, from_currency: str, to_currency: str) -> float:
+        """Return the exchange rate from from_currency to to_currency."""
+```
+
+Any object that inherits from `RateProvider` and implements `get_rate` can be used as a drop-in rate source.
+
+### Step 1 — Implement `StaticRateProvider.get_rate`
+
+Open `src/rate_provider.py` and replace the `NotImplementedError` stub with real logic.
+
+Start in `tests/test_rate_provider.py` — write a failing test, implement the method, then refactor.
+
+**Hints**:
+
+- Look up the currency pair in `self._rates`
+- Raise `ValueError` when the pair is not found
+
+### Step 2 — Integrate `RateProvider` with `CurrencyExchange`
+
+Update `CurrencyExchange` to accept a `RateProvider` and use it inside `convert()`.
+
+**Hints**:
+
+- Accept the provider via `__init__` (dependency injection)
+- Delegate the rate lookup to the provider — `CurrencyExchange` should not know where rates come from
+- Drive the change from `tests/test_integration.py`
+
+### Step 3 — Write integration tests
+
+Integration tests verify that `CurrencyExchange` and a `RateProvider` work correctly **together**.
+Open `tests/test_integration.py` — a fixture is already provided. Add tests inside `TestCurrencyExchangeWithRateProvider` following the TDD cycle.
+
+### Suggested provider test cases (unit level)
+
+Drive these with TDD before writing the integration tests above:
+
+1. **`test_get_rate_returns_correct_value`** — provider returns the rate set at construction.
+2. **`test_get_rate_unknown_pair_raises_value_error`** — provider raises `ValueError` for unsupported pairs.
+3. **`test_get_rate_is_case_insensitive`** — `"usd"` and `"USD"` resolve to the same rate.
+4. **`test_empty_provider_raises_value_error`** — a provider initialised with no rates raises for any pair.
