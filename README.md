@@ -4,13 +4,17 @@ This is a hands-on Test-Driven Development (TDD) workshop using Python and pytes
 
 ## Setup
 
-### Create virtual environment, install dependencies, and activate
+### 1. Create virtual environment and install dependencies
 
 ```bash
 make setup
 ```
 
-This command will create a `.venv` directory, install all dependencies, and automatically activate the virtual environment in a new shell.
+### 2. Activate the virtual environment
+
+```bash
+source .venv/bin/activate
+```
 
 ## Running Tests
 

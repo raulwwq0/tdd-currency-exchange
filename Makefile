@@ -13,14 +13,13 @@ help: ## Show this help message
 	@echo 'Available targets:'
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-setup: ## Create virtual environment, install dependencies, and activate
+setup: ## Create virtual environment and install dependencies
 	$(PYTHON) -m venv $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.txt
 	@echo ""
 	@echo "Virtual environment created successfully!"
-	@echo "Activating virtual environment..."
-	@exec $(SHELL) -c ". $(VENV)/bin/activate && exec $(SHELL)"
+	@echo "To activate it, run: source $(VENV)/bin/activate"
 
 install: ## Install dependencies (requires active venv)
 	pip install -r requirements.txt
