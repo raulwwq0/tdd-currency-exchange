@@ -145,3 +145,75 @@ Follow the TDD cycle for each test case below:
 - Refactor if needed, keeping tests green
 - Commit after each green test
 - Move to the next test only when current test is passing
+
+---
+
+## Workshop Exercise: Rate Provider
+
+### Overview
+
+`src/rate_provider.py` contains two classes that form the foundation of a pluggable rate-fetching system:
+
+| Class                | Purpose                                                                    |
+| -------------------- | -------------------------------------------------------------------------- |
+| `RateProvider`       | Abstract base class — defines the contract every provider must fulfil      |
+| `StaticRateProvider` | Concrete stub backed by an in-memory dict — **your implementation target** |
+
+### The `RateProvider` contract
+
+```python
+class RateProvider(ABC):
+    @abstractmethod
+    def get_rate(self, from_currency: str, to_currency: str) -> float:
+        """Return the exchange rate from from_currency to to_currency."""
+```
+
+Any object that inherits from `RateProvider` and implements `get_rate` can be used as a drop-in rate source.
+
+### Step 1 — Implement `StaticRateProvider.get_rate`
+
+Open `src/rate_provider.py` and replace the `NotImplementedError` stub with real logic:
+
+```python
+def get_rate(self, from_currency: str, to_currency: str) -> float:
+    pair = (from_currency.upper(), to_currency.upper())
+    if pair not in self._rates:
+        raise ValueError(f"No rate available for {from_currency} -> {to_currency}")
+    return self._rates[pair]
+```
+
+Follow TDD: write a failing test first, then add the code above, then refactor.
+
+### Step 2 — Integrate `RateProvider` with `CurrencyExchange`
+
+Update `CurrencyExchange` to accept an optional provider at construction time:
+
+```python
+from src.rate_provider import RateProvider
+
+class CurrencyExchange:
+    def __init__(self, rate_provider: RateProvider | None = None):
+        self._rate_provider = rate_provider
+
+    def convert(self, amount: float, from_currency: str, to_currency: str) -> float:
+        if from_currency == to_currency:
+            return amount
+        rate = self._rate_provider.get_rate(from_currency, to_currency)
+        return amount * rate
+```
+
+The provider is injected via the constructor — `CurrencyExchange` never needs to know where the rates come from.
+
+### Step 3 — Write integration tests
+
+Integration tests verify that `CurrencyExchange` and a `RateProvider` work correctly **together**.
+Open `tests/test_integration.py` — a fixture is already provided. Add tests inside `TestCurrencyExchangeWithRateProvider` following the TDD cycle.
+
+### Suggested provider test cases (unit level)
+
+Drive these with TDD before writing the integration tests above:
+
+1. **`test_get_rate_returns_correct_value`** — provider returns the rate set at construction.
+2. **`test_get_rate_unknown_pair_raises_value_error`** — provider raises `ValueError` for unsupported pairs.
+3. **`test_get_rate_is_case_insensitive`** — `"usd"` and `"USD"` resolve to the same rate.
+4. **`test_empty_provider_raises_value_error`** — a provider initialised with no rates raises for any pair.
