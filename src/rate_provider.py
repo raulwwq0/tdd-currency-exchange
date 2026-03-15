@@ -62,8 +62,24 @@ class StaticRateProvider(RateProvider):
     def get_rate(self, from_currency: str, to_currency: str) -> float:
         """Return the rate for the given currency pair.
 
-        TODO (workshop): implement this method.
-              Hint - look up (from_currency, to_currency) in self._rates
-              and raise ValueError when the pair is not found.
+        Args:
+            from_currency: ISO 4217 currency code of the source currency.
+            to_currency:   ISO 4217 currency code of the target currency.
+
+        Returns:
+            1.0 when both currencies are the same; otherwise the rate from
+            the internal table.
+
+        Raises:
+            ValueError: If the pair is not present in the rates table.
         """
-        raise NotImplementedError("TODO: implement get_rate in StaticRateProvider")
+        from_currency = from_currency.upper()
+        to_currency = to_currency.upper()
+
+        if from_currency == to_currency:
+            return 1.0
+
+        pair = (from_currency, to_currency)
+        if pair not in self._rates:
+            raise ValueError(f"No rate available for {from_currency} -> {to_currency}")
+        return self._rates[pair]

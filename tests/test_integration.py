@@ -30,9 +30,22 @@ def exchange():
 class TestCurrencyExchangeWithRateProvider:
     """Integration test suite for CurrencyExchange + RateProvider."""
 
-    # TODO: Add more tests following TDD approach
-    # Example ideas:
-    # - test_convert_usd_to_eur
-    # - test_convert_eur_to_usd
-    # - test_convert_same_currency_ignores_provider
-    # - test_convert_unsupported_pair_raises_value_error
+    def test_convert_usd_to_eur(self, exchange):
+        """Should convert USD to EUR using the injected provider rate."""
+        result = exchange.convert(100, "USD", "EUR")
+        assert result == pytest.approx(92.0)
+
+    def test_convert_eur_to_usd(self, exchange):
+        """Should convert EUR to USD using the injected provider rate."""
+        result = exchange.convert(50, "EUR", "USD")
+        assert result == pytest.approx(54.5)
+
+    def test_convert_same_currency_ignores_provider(self, exchange):
+        """Same-currency conversion should return the original amount."""
+        result = exchange.convert(200, "USD", "USD")
+        assert result == 200
+
+    def test_convert_unsupported_pair_raises_value_error(self, exchange):
+        """Provider raises ValueError for a pair not in the rates table."""
+        with pytest.raises(ValueError):
+            exchange.convert(100, "JPY", "GBP")

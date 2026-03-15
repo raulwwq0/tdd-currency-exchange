@@ -32,7 +32,7 @@ class TestCurrencyExchange:
         """Test setting an exchange rate between two currencies."""
         exchange = CurrencyExchange()
         exchange.set_exchange_rate("USD", "EUR", 0.85)
-        # If no exception is raised, the test passes
+        assert exchange.exchange_rates[("USD", "EUR")] == 0.85
 
     def test_get_exchange_rate(self):
         """Test retrieving a previously set exchange rate."""

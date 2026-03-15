@@ -19,17 +19,24 @@ class CurrencyExchange:
         self.exchange_rates = {}
 
     def convert(self, amount, from_currency, to_currency):
-        """Convert an amount from one currency to another."""
+        """Convert an amount from one currency to another.
+
+        Delegates to the injected RateProvider when available; falls back to
+        the internal exchange_rates dict otherwise.
+        """
         if from_currency == to_currency:
             return amount
+
+        if self._rate_provider is not None:
+            rate = self._rate_provider.get_rate(from_currency, to_currency)
+            return amount * rate
 
         key = (from_currency, to_currency)
         if key not in self.exchange_rates:
             raise ValueError(
                 f"Exchange rate not found for {from_currency} to {to_currency}"
             )
-        rate = self.exchange_rates[key]
-        return amount * rate
+        return amount * self.exchange_rates[key]
 
     def set_exchange_rate(self, from_currency, to_currency, rate):
         """Set the exchange rate from one currency to another."""
